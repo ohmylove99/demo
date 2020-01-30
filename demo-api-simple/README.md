@@ -15,6 +15,7 @@ For Integration Test, Using SpringBootTest and rely on some in-memory database t
 * [Unit Test](https://www.baeldung.com/junit-5)
 * [Integration Test for API](https://www.baeldung.com/integration-testing-a-rest-api)
 https://dzone.com/articles/integration-testing-in-spring-boot-1
+https://mkyong.com/spring-boot/spring-rest-integration-test-example/
 
 ### Reference Documentation
 For further reference, please consider the following sections:

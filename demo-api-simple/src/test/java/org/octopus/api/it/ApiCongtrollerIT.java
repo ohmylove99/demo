@@ -42,8 +42,7 @@ public class ApiCongtrollerIT {
 
 	@Test
 	public void hello() {
-		assertEquals("Hello World",
-				this.restTemplate.getForObject("http://localhost:" + port + "/api/hello", String.class));
+		assertEquals("Hello World", this.restTemplate.getForObject("/api/hello", String.class));
 	}
 
 	@Test

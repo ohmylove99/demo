@@ -24,13 +24,13 @@ public class ApiControllerUT {
 	private MockMvc mvc;
 	@Autowired
 	protected WebApplicationContext wac;
-	@Autowired
+	/*@Autowired
 	ApiController apiController;
 
 	@Before
 	public void setup() throws Exception {
 		this.mvc = standaloneSetup(this.apiController).build();
-	}
+	}*/
 
 	@Test
 	public void test_hello() throws Exception {
