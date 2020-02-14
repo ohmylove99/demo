@@ -18,8 +18,11 @@ import org.json.JSONException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.modelmapper.ModelMapper;
 import org.octopus.api.entity.BookEntity;
-import org.octopus.api.repository.BookRepository;
+import org.octopus.api.mapper.BookMapper;
+import org.octopus.api.model.BookDto;
+import org.octopus.api.service.BookService;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -49,7 +52,13 @@ public class BookControllerIT {
 	private RestTemplate patchRestTemplate;
 
 	@MockBean
-	private BookRepository mockRepository;
+	private BookService mockService;
+	
+	@MockBean
+	private ModelMapper modelMapper;
+	
+	@MockBean
+	private BookMapper<BookEntity, BookDto> mapper;
 
 	@Before
 	public void init() {
@@ -57,7 +66,7 @@ public class BookControllerIT {
 		book.setId(1L);
 		book.setName("Book Name");
 		book.setPrice(new BigDecimal("9.99"));
-		when(mockRepository.findById(1L)).thenReturn(Optional.of(book));
+		when(mockService.get(1L)).thenReturn(Optional.of(book));
 
 		this.patchRestTemplate = restTemplate.getRestTemplate();
 		HttpClient httpClient = HttpClientBuilder.create().build();
@@ -76,7 +85,7 @@ public class BookControllerIT {
 
 		JSONAssert.assertEquals(expected, response.getBody(), false);
 
-		verify(mockRepository, times(1)).findById(1L);
+		verify(mockService, times(1)).get(1L);
 
 	}
 
@@ -95,7 +104,7 @@ public class BookControllerIT {
 
 		List<BookEntity> books = Arrays.asList(book1, book2);
 
-		when(mockRepository.findAll()).thenReturn(books);
+		when(mockService.findAll()).thenReturn(books);
 
 		String expected = om.writeValueAsString(books);
 
@@ -104,13 +113,13 @@ public class BookControllerIT {
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		JSONAssert.assertEquals(expected, response.getBody(), false);
 
-		verify(mockRepository, times(1)).findAll();
+		verify(mockService, times(1)).findAll();
 	}
 
 	@Test
 	public void find_bookIdNotFound_404() throws Exception {
 
-		String expected = "{status:404,error:\"Not Found\",message:\"Book id not found : 5\",path:\"/api/book/5\"}";
+		String expected = "{status:404,error:\"Not Found\",message:\"Entity(BookEntity) Identity(5) not found\",path:\"/api/book/5\"}";
 
 		ResponseEntity<String> response = restTemplate.getForEntity("/api/book/5", String.class);
 
@@ -126,7 +135,7 @@ public class BookControllerIT {
 		newBook.setId(1L);
 		newBook.setName("Spring Boot");
 		newBook.setPrice(new BigDecimal("2.99"));
-		when(mockRepository.save(any(BookEntity.class))).thenReturn(newBook);
+		when(mockService.create(any(BookEntity.class))).thenReturn(newBook);
 
 		String expected = om.writeValueAsString(newBook);
 
@@ -135,7 +144,7 @@ public class BookControllerIT {
 		assertEquals(HttpStatus.CREATED, response.getStatusCode());
 		JSONAssert.assertEquals(expected, response.getBody(), false);
 
-		verify(mockRepository, times(1)).save(any(BookEntity.class));
+		verify(mockService, times(1)).create(any(BookEntity.class));
 
 	}
 
@@ -146,7 +155,7 @@ public class BookControllerIT {
 		updateBook.setId(1L);
 		updateBook.setName("Book ABC");
 		updateBook.setPrice(new BigDecimal("19.99"));
-		when(mockRepository.save(any(BookEntity.class))).thenReturn(updateBook);
+		when(mockService.update(any(BookEntity.class))).thenReturn(updateBook);
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
@@ -158,15 +167,15 @@ public class BookControllerIT {
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		JSONAssert.assertEquals(om.writeValueAsString(updateBook), response.getBody(), false);
 
-		verify(mockRepository, times(1)).findById(1L);
-		verify(mockRepository, times(1)).save(any(BookEntity.class));
+		verify(mockService, times(1)).get(1L);
+		verify(mockService, times(1)).update(any(BookEntity.class));
 
 	}
 
 	@Test
 	public void patch_bookName_OK() {
 
-		when(mockRepository.save(any(BookEntity.class))).thenReturn(new BookEntity());
+		when(mockService.update(any(BookEntity.class))).thenReturn(new BookEntity());
 		String patchInJson = "{\"name\":\"super name\"}";
 
 		HttpHeaders headers = new HttpHeaders();
@@ -178,8 +187,8 @@ public class BookControllerIT {
 
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 
-		verify(mockRepository, times(1)).findById(1L);
-		verify(mockRepository, times(1)).save(any(BookEntity.class));
+		verify(mockService, times(1)).get(1L);
+		verify(mockService, times(1)).update(any(BookEntity.class));
 
 	}
 
@@ -199,25 +208,25 @@ public class BookControllerIT {
 		assertEquals(HttpStatus.METHOD_NOT_ALLOWED, response.getStatusCode());
 		JSONAssert.assertEquals(expected, response.getBody(), false);
 
-		verify(mockRepository, times(1)).findById(1L);
-		verify(mockRepository, times(0)).save(any(BookEntity.class));
+		verify(mockService, times(1)).get(1L);
+		verify(mockService, times(0)).update(any(BookEntity.class));
 	}
 
 	@Test
 	public void delete_book_OK() {
 
-		doNothing().when(mockRepository).deleteById(1L);
+		doNothing().when(mockService).remove(1L);
 
 		HttpEntity<String> entity = new HttpEntity<>(null, new HttpHeaders());
 		ResponseEntity<String> response = restTemplate.exchange("/api/book/1", HttpMethod.DELETE, entity, String.class);
 
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 
-		verify(mockRepository, times(1)).deleteById(1L);
+		verify(mockService, times(1)).remove(1L);
 	}
 
 	@Test
-	public void save_emptyName_emptyPrice_400() throws JSONException {
+	public void create_emptyName_emptyPrice_400() throws JSONException {
 
 		String bookInJson = "{\"id1\":\"ABC\"}";
 
@@ -233,7 +242,7 @@ public class BookControllerIT {
 		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
 		JSONAssert.assertEquals(expectedJson, response.getBody(), false);
 
-		verify(mockRepository, times(0)).save(any(BookEntity.class));
+		verify(mockService, times(0)).create(any(BookEntity.class));
 
 	}
 
@@ -253,7 +262,7 @@ public class BookControllerIT {
 		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
 		JSONAssert.assertEquals(null, response.getBody(), false);
 
-		verify(mockRepository, times(0)).save(any(BookEntity.class));
+		verify(mockService, times(0)).create(any(BookEntity.class));
 
 	}
 
@@ -262,7 +271,7 @@ public class BookControllerIT {
 	 * "errors":["size must be between 3 and 20"] }
 	 */
 	@Test
-	public void save_invalidName_400() throws JSONException {
+	public void create_invalidName_400() throws JSONException {
 
 		String bookInJson = "{\"name\":\"A\",\"price\":\"9.99\"}";
 
@@ -277,7 +286,7 @@ public class BookControllerIT {
 		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
 		JSONAssert.assertEquals(expectedJson, response.getBody(), false);
 
-		verify(mockRepository, times(0)).save(any(BookEntity.class));
+		verify(mockService, times(0)).create(any(BookEntity.class));
 
 	}
 }

@@ -1,25 +1,44 @@
 # Getting Started
 
-### Banner Gen
-[Banner Generation](https://devops.datenkollektiv.de/banner.txt/index.html)
-Create banner.txt into resources folder, Copy content generated from website.
+## IDE Setup
 
 ### Setup lombok
+
 * [Setup lombok for eclipse/sts](http://codeomitted.com/setup-lombok-with-stseclipse-based-ide/)
 
-### Spring Boot Unit Test & Integration Test
+## Tips
+
+### Banner Gen
+
+* [Banner Generation Online](https://devops.datenkollektiv.de/banner.txt/index.html)
+* Create banner.txt into resources folder, Copy content generated from website.
+
+### POJO
+
+#### DTO and Entity Mapping
+
+* [Entity and DTO mapping](https://www.baeldung.com/entity-to-and-from-dto-for-a-java-spring-application)
+
+### Testing
+
+#### Spring Boot Unit Test & Integration Test
+
+Unit Test vs Integration Test
 For Unit Test, Using WebMvcTest, Mock Service Layer
 For Integration Test, Using SpringBootTest and rely on some in-memory database to do test
+
 * [SpringBoot Test](https://www.baeldung.com/spring-boot-testing)
 * [Integration Test](https://www.baeldung.com/integration-testing-in-spring)
 * [Unit Test](https://www.baeldung.com/junit-5)
 * [Integration Test for API](https://www.baeldung.com/integration-testing-a-rest-api)
-https://dzone.com/articles/integration-testing-in-spring-boot-1
+* [Integration Test for Spring Boot](https://dzone.com/articles/integration-testing-in-spring-boot-1)
 
-### Spring Boot Rest Validation
-https://mkyong.com/spring-boot/spring-rest-validation-example/
+### Validation
+
+* [Spring Boot Rest Validation](https://mkyong.com/spring-boot/spring-rest-validation-example/)
 
 ### Reference Documentation
+
 For further reference, please consider the following sections:
 
 * [Official Gradle documentation](https://docs.gradle.org)
@@ -29,6 +48,7 @@ For further reference, please consider the following sections:
 * [Spring Web](https://docs.spring.io/spring-boot/docs/2.2.4.RELEASE/reference/htmlsingle/#boot-features-developing-web-applications)
 
 ### Guides
+
 The following guides illustrate how to use some features concretely:
 
 * [Building a RESTful Web Service](https://spring.io/guides/gs/rest-service/)
@@ -36,7 +56,7 @@ The following guides illustrate how to use some features concretely:
 * [Building REST services with Spring](https://spring.io/guides/tutorials/bookmarks/)
 
 ### Additional Links
+
 These additional references should also help you:
 
 * [Gradle Build Scans – insights for your project's build](https://scans.gradle.com#gradle)
-

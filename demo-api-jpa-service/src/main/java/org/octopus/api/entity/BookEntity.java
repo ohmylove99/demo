@@ -12,13 +12,16 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
-@ToString
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+
 @Entity
 @Table(name = "demo_api_jpa_simple_book")
 public class BookEntity {
@@ -29,7 +32,7 @@ public class BookEntity {
 	@Size(min = 3, max = 20)
 	@NotEmpty(message = "Please provide a name")
 	private String name;
-	
+
 	@NotNull(message = "Please provide a price")
 	private BigDecimal price;
 
