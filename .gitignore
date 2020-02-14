@@ -26,3 +26,5 @@ gradlew
 gradle/
 .metadata/
 .DS_Store
+bin/
+build/
